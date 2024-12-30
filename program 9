@@ -1,0 +1,36 @@
+import nltk
+from nltk.tokenize import word_tokenize
+
+# Download necessary NLTK data
+nltk.download('punkt')
+
+def rule_based_tagger(text):
+    """
+    A simple rule-based POS tagger using regular expressions.
+    """
+    rules = [
+        (r'.*ing$', 'VBG'),   # Gerunds
+        (r'.*ed$', 'VBD'),    # Past tense verbs
+        (r'.*es$', 'VBZ'),    # Third person singular verbs
+        (r'.*ly$', 'RB'),     # Adverbs
+        (r'.*ion$', 'NN'),    # Nouns ending in -ion
+        (r'[A-Z].*', 'NNP'),  # Proper nouns
+        (r'\d+', 'CD'),       # Cardinal numbers
+        (r'.*', 'NN')         # Default to noun
+    ]
+
+    words = word_tokenize(text)
+    tagged_words = []
+    
+    for word in words:
+        for pattern, tag in rules:
+            if nltk.re.match(pattern, word):
+                tagged_words.append((word, tag))
+                break
+
+    return tagged_words
+
+# Example usage
+text = "Running jumped happily. The organization was founded in 1990."
+tags = rule_based_tagger(text)
+print(tags)
