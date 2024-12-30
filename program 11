@@ -1,0 +1,26 @@
+import nltk
+from nltk import CFG
+
+def top_down_parser():
+    """
+    A simple top-down parser for CFGs.
+    """
+    grammar = CFG.fromstring("""
+        S -> NP VP
+        NP -> Det N
+        VP -> V NP | V
+        Det -> 'the' | 'a'
+        N -> 'dog' | 'cat'
+        V -> 'chased' | 'saw'
+    """)
+
+    parser = nltk.ChartParser(grammar)
+
+    sentence = "the dog chased a cat".split()
+    print("Parsing:", " ".join(sentence))
+
+    for tree in parser.parse(sentence):
+        print(tree)
+
+# Example usage
+top_down_parser()
