@@ -1,0 +1,34 @@
+import nltk
+from nltk.tag import RegexpTagger, BrillTaggerTrainer
+from nltk.tag.brill import Template
+from nltk.tag.brill_trainer import Pos
+
+# Download necessary NLTK data
+nltk.download('treebank')
+
+# Load a corpus for training
+from nltk.corpus import treebank
+train_data = treebank.tagged_sents()[:3000]
+test_data = treebank.tagged_sents()[3000:]
+
+# Baseline tagger: Default to NN (noun)
+default_tagger = nltk.DefaultTagger('NN')
+
+# Define transformation templates
+templates = [
+    Template(Pos([-1])),  # Previous POS
+    Template(Pos([1])),   # Next POS
+]
+
+# Train a Brill Tagger
+brill_trainer = BrillTaggerTrainer(initial_tagger=default_tagger, templates=templates)
+brill_tagger = brill_trainer.train(train_data, max_rules=10)
+
+# Evaluate the tagger
+accuracy = brill_tagger.evaluate(test_data)
+print(f"Accuracy: {accuracy:.2f}")
+
+# Example tagging
+sentence = [("The", "DT"), ("quick", "JJ"), ("brown", "JJ"), ("fox", "NN"), ("jumps", "VBZ")]
+tagged_sentence = brill_tagger.tag([word for word, _ in sentence])
+print(tagged_sentence)
