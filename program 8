@@ -1,0 +1,59 @@
+import nltk
+from collections import defaultdict, Counter
+import random
+
+# Ensure the required resources are downloaded
+nltk.download('brown')
+nltk.download('universal_tagset')
+
+def train_unigram_tagger(corpus):
+    """
+    Train a unigram POS tagger using a given corpus.
+    """
+    tag_counts = defaultdict(Counter)
+    
+    # Process tagged sentences
+    for sentence in corpus:
+        for word, tag in sentence:
+            tag_counts[word][tag] += 1
+    
+    # Calculate probabilities
+    unigram_model = {word: {tag: count / sum(tag_counts[word].values()) 
+                            for tag, count in tags.items()} 
+                     for word, tags in tag_counts.items()}
+    
+    return unigram_model
+
+def predict_tags(unigram_model, sentence):
+    """
+    Predict POS tags for a given sentence using the unigram model.
+    """
+    tags = []
+    for word in sentence:
+        if word in unigram_model:
+            # Choose the most probable tag
+            predicted_tag = max(unigram_model[word], key=unigram_model[word].get)
+        else:
+            # Assign a default tag for unknown words
+            predicted_tag = "NN"  # Default to noun
+        tags.append((word, predicted_tag))
+    return tags
+
+# Example usage
+if name == "main":
+    # Load the Brown Corpus with universal tagset
+    from nltk.corpus import brown
+    corpus = brown.tagged_sents(tagset='universal')
+    
+    # Train the unigram model
+    unigram_model = train_unigram_tagger(corpus)
+    
+    # Input sentence
+    sentence = "The quick brown fox jumps over the lazy dog".split()
+    
+    # Predict POS tags
+    predicted_tags = predict_tags(unigram_model, sentence)
+    
+    print("Predicted POS Tags:")
+    for word, tag in predicted_tags:
+        print(f"{word} -> {tag}")
