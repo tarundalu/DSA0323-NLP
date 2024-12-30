@@ -1,0 +1,55 @@
+import random
+from collections import defaultdict
+
+def build_bigram_model(corpus):
+    """
+    Builds a bigram model from a given text corpus.
+    """
+    bigram_model = defaultdict(lambda: defaultdict(int))
+    words = corpus.split()
+    
+    # Count occurrences of each bigram
+    for i in range(len(words) - 1):
+        bigram_model[words[i]][words[i + 1]] += 1
+    
+    # Normalize to probabilities
+    for word, next_words in bigram_model.items():
+        total_count = sum(next_words.values())
+        bigram_model[word] = {next_word: count / total_count for next_word, count in next_words.items()}
+    
+    return bigram_model
+
+def generate_text(bigram_model, start_word, num_words=20):
+    """
+    Generates text using the bigram model.
+    """
+    current_word = start_word
+    generated_text = [current_word]
+    
+    for _ in range(num_words - 1):
+        if current_word not in bigram_model or not bigram_model[current_word]:
+            break
+        
+        # Choose the next word based on probabilities
+        next_words = list(bigram_model[current_word].keys())
+        probabilities = list(bigram_model[current_word].values())
+        current_word = random.choices(next_words, probabilities)[0]
+        generated_text.append(current_word)
+    
+    return ' '.join(generated_text)
+
+# Example usage
+if _name_ == "_main_":
+    # Sample text corpus
+    corpus = """
+    the cat sat on the mat. the cat played with the mat. the dog barked at the cat.
+    """
+    
+    # Build the bigram model
+    bigram_model = build_bigram_model(corpus)
+    
+    # Generate text
+    start_word = "the"
+    generated_text = generate_text(bigram_model, start_word, num_words=20)
+    print("Generated Text:")
+    print(generated_text)
